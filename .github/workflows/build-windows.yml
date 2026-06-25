@@ -42,6 +42,7 @@ jobs:
           -G Ninja
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          '-DCMAKE_C_FLAGS=-DCRYPTO_ALIGN(x)='
           -Dwith_crypto_library=openssl
 
       - name: Build
