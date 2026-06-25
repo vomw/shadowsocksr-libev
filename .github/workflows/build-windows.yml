@@ -1,0 +1,60 @@
+name: Build Windows
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Windows x64
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-pcre
+            mingw-w64-x86_64-zlib
+
+      - name: Configure
+        run: >
+          cmake
+          -S .
+          -B build
+          -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -Dwith_crypto_library=openssl
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Stage artifacts
+        run: |
+          mkdir -p artifacts
+          cp build/src/ss_local.exe artifacts/
+          cp build/src/ss_redir.exe artifacts/
+
+      - name: Upload Windows executables
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadowsocks-libev-windows-x64
+          path: artifacts/*.exe
+          if-no-files-found: error
