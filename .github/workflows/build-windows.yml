@@ -46,13 +46,12 @@ jobs:
           -Dwith_crypto_library=openssl
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --target ss_local
 
       - name: Stage artifacts
         run: |
           mkdir -p artifacts
           cp build/src/ss_local.exe artifacts/
-          cp build/src/ss_redir.exe artifacts/
 
       - name: Upload Windows executables
         uses: actions/upload-artifact@v4
