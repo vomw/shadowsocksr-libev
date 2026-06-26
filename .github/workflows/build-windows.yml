@@ -26,32 +26,27 @@ jobs:
           msystem: MINGW64
           update: true
           install: >-
-            mingw-w64-x86_64-cmake
             mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-make
-            mingw-w64-x86_64-ninja
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-pcre
             mingw-w64-x86_64-zlib
+            make
+            autoconf
+            automake
+            libtool
+            pkg-config
+            git
 
-      - name: Configure
-        run: >
-          cmake
-          -S .
-          -B build
-          -G Ninja
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-          '-DCMAKE_C_FLAGS=-DCRYPTO_ALIGN(x)='
-          -Dwith_crypto_library=openssl
-
-      - name: Build
-        run: cmake --build build --config Release --target ss_local
+      - name: Configure and Build
+        run: |
+          ./autogen.sh
+          ./configure --disable-documentation CFLAGS="-g -O2 -Wno-error"
+          make -j$(nproc)
 
       - name: Stage artifacts
         run: |
           mkdir -p artifacts
-          cp build/src/ss_local.exe artifacts/
+          cp src/ss-local.exe artifacts/
 
       - name: Upload Windows executables
         uses: actions/upload-artifact@v4
