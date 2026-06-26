@@ -74,6 +74,12 @@ extern "C" {
     uint8_t  personal[BLAKE2S_PERSONALBYTES];  // 32
   } blake2s_param;
 
+#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+# pragma pack()
+#else
+# pragma pack(pop)
+#endif
+
 CRYPTO_ALIGN( 64 ) typedef struct blake2s_state_
   {
     uint32_t h[8];
@@ -83,6 +89,12 @@ CRYPTO_ALIGN( 64 ) typedef struct blake2s_state_
     size_t   buflen;
     uint8_t  last_node;
   } blake2s_state ;
+
+#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+# pragma pack(1)
+#else
+# pragma pack(push, 1)
+#endif
 
   typedef struct blake2b_param_
   {

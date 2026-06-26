@@ -14,12 +14,6 @@
 extern "C" {
 #endif
 
-#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
-# pragma pack(1)
-#else
-# pragma pack(push, 1)
-#endif
-
 typedef CRYPTO_ALIGN(64) struct crypto_generichash_blake2b_state {
     uint64_t h[8];
     uint64_t t[2];
@@ -28,12 +22,6 @@ typedef CRYPTO_ALIGN(64) struct crypto_generichash_blake2b_state {
     size_t   buflen;
     uint8_t  last_node;
 } crypto_generichash_blake2b_state;
-
-#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
-# pragma pack()
-#else
-# pragma pack(pop)
-#endif
 
 #define crypto_generichash_blake2b_BYTES_MIN     16U
 SODIUM_EXPORT
