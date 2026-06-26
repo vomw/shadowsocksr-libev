@@ -45,7 +45,6 @@ jobs:
 
       - name: Stage artifacts
         run: |
-          git status
           mkdir -p artifacts
           cp src/ss-local.exe artifacts/
 
@@ -53,5 +52,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: shadowsocks-libev-windows-x64
-          path: src/*
+          path: artifacts/*.exe
           if-no-files-found: error
