@@ -46,11 +46,16 @@ jobs:
       - name: Stage artifacts
         run: |
           mkdir -p artifacts
-          cp src/ss-local.exe artifacts/
+          # Copy all built executables
+          cp src/*.exe artifacts/
+          # Copy required MinGW runtime DLLs for each exe
+          for exe in artifacts/*.exe; do
+            ldd "$exe" | grep '/mingw64/bin/' | awk '{print $3}' | xargs -I{} cp -n {} artifacts/
+          done
 
       - name: Upload Windows executables
         uses: actions/upload-artifact@v4
         with:
           name: shadowsocks-libev-windows-x64
-          path: artifacts/*.exe
+          path: artifacts/
           if-no-files-found: error
