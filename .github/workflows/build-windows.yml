@@ -37,6 +37,39 @@ jobs:
             pkg-config
             git
 
+      - name: Patch vendored libsodium for GCC >= 11
+        run: |
+          # GCC >= 11 enforces that array element size must be a multiple of
+          # its alignment.  The vendored blake2.h puts CRYPTO_ALIGN(64) state
+          # structs inside a #pragma pack(push,1) region, which breaks that
+          # rule when those types are used as array members in blake2sp_state
+          # and blake2bp_state.
+          #
+          # Fix: close the pack region right after blake2b_param (the last
+          # struct that actually needs pack(1)), and remove the now-redundant
+          # pack(pop) that was after blake2bp_state.
+          BLAKE2_H=libsodium/src/libsodium/crypto_generichash/blake2/ref/blake2.h
+
+          # Insert pack(pop) after "} blake2b_param;" (line containing blake2b_param)
+          sed -i '/}[[:space:]]*blake2b_param;/a\
+\
+#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)\
+# pragma pack()\
+#else\
+# pragma pack(pop)\
+#endif' "$BLAKE2_H"
+
+          # Remove the original (now-duplicate) pack(pop) block that appears
+          # after blake2bp_state.  It is a 4-line block starting with the
+          # #if defined(__IBMC__) check, but we only want to remove the SECOND
+          # occurrence (the one we didn't just insert).
+          # We use awk: skip the second occurrence of the 4-line pack-pop block.
+          awk '
+            /^#if defined\(__IBMC__\)/ { seen++; if (seen == 2) { skip=4; } }
+            skip > 0 { skip--; next }
+            { print }
+          ' "$BLAKE2_H" > "${BLAKE2_H}.tmp" && mv "${BLAKE2_H}.tmp" "$BLAKE2_H"
+
       - name: Configure and Build
         run: |
           ./autogen.sh
