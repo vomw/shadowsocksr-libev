@@ -80,7 +80,7 @@ extern "C" {
 # pragma pack(pop)
 #endif
 
-CRYPTO_ALIGN( 64 ) typedef struct blake2s_state_
+typedef struct CRYPTO_ALIGN( 64 ) blake2s_state_
   {
     uint32_t h[8];
     uint32_t t[2];

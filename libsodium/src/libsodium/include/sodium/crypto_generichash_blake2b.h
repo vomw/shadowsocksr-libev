@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-typedef CRYPTO_ALIGN(64) struct crypto_generichash_blake2b_state {
+typedef struct CRYPTO_ALIGN(64) crypto_generichash_blake2b_state {
     uint64_t h[8];
     uint64_t t[2];
     uint64_t f[2];
