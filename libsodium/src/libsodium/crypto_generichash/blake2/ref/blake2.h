@@ -74,7 +74,13 @@ extern "C" {
     uint8_t  personal[BLAKE2S_PERSONALBYTES];  // 32
   } blake2s_param;
 
-CRYPTO_ALIGN( 64 ) typedef struct blake2s_state_
+#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+# pragma pack()
+#else
+# pragma pack(pop)
+#endif
+
+typedef struct CRYPTO_ALIGN( 64 ) blake2s_state_
   {
     uint32_t h[8];
     uint32_t t[2];
@@ -83,6 +89,12 @@ CRYPTO_ALIGN( 64 ) typedef struct blake2s_state_
     size_t   buflen;
     uint8_t  last_node;
   } blake2s_state ;
+
+#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+# pragma pack(1)
+#else
+# pragma pack(push, 1)
+#endif
 
   typedef struct blake2b_param_
   {
@@ -98,6 +110,12 @@ CRYPTO_ALIGN( 64 ) typedef struct blake2s_state_
     uint8_t  salt[BLAKE2B_SALTBYTES]; // 48
     uint8_t  personal[BLAKE2B_PERSONALBYTES];  // 64
   } blake2b_param;
+
+#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+# pragma pack()
+#else
+# pragma pack(pop)
+#endif
 
 #ifndef DEFINE_BLAKE2B_STATE
 typedef crypto_generichash_blake2b_state blake2b_state;
@@ -129,11 +147,7 @@ CRYPTO_ALIGN( 64 ) typedef struct blake2b_state_
     size_t  buflen;
   } blake2bp_state;
 
-#if defined(__IBMC__) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
-# pragma pack()
-#else
-# pragma pack(pop)
-#endif
+
 
   // Streaming API
   int blake2s_init( blake2s_state *S, const uint8_t outlen );

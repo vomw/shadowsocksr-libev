@@ -7,6 +7,8 @@
  * ----------------------------------------------------------------------
  */
 
+#ifndef _WIN32
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -662,3 +664,5 @@ cork_subprocess_group_wait(struct cork_subprocess_group *group)
     }
     return 0;
 }
+
+#endif /* !_WIN32 */
