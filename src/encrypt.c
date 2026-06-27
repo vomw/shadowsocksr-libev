@@ -32,6 +32,11 @@
 #include <openssl/rand.h>
 #include <openssl/hmac.h>
 #include <openssl/aes.h>
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/provider.h>
+#endif
+
 
 #elif defined(USE_CRYPTO_POLARSSL)
 
@@ -1423,6 +1428,14 @@ enc_key_init(cipher_env_t *env, int method, const char *pass)
 
 #if defined(USE_CRYPTO_OPENSSL)
     OpenSSL_add_all_algorithms();
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+    static int providers_loaded = 0;
+    if (!providers_loaded) {
+        OSSL_PROVIDER_load(NULL, "legacy");
+        OSSL_PROVIDER_load(NULL, "default");
+        providers_loaded = 1;
+    }
+#endif
 #else
     cipher_kt_t cipher_info;
 #endif
