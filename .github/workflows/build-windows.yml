@@ -37,8 +37,20 @@ jobs:
             pkg-config
             git
 
+
+      - name: Compile OpenSSL
+        run: |
+          curl -O https://github.com/openssl/openssl/releases/download/OpenSSL_1_0_1e/openssl-1.0.1e.tar.gz
+          tar zxf openssl-1.0.1e.tar.gz
+          cd openssl-1.0.1e
+          ./config --prefix="$HOME/prebuilt" --openssldir="$HOME/prebuilt/openssl"
+          make && make install
+          git status
+
+
       - name: Configure and Build
         run: |
+          pwd
           ./autogen.sh
           ./configure --disable-documentation CFLAGS="-g -O2 -Wno-error"
           make -j$(nproc)
