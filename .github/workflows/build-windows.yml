@@ -27,7 +27,6 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-openssl
             mingw-w64-x86_64-pcre
             mingw-w64-x86_64-zlib
             make
@@ -37,23 +36,21 @@ jobs:
             pkg-config
             git
 
-
       - name: Compile OpenSSL
         run: |
           where wget
           wget -O "openssl-1.0.1e.tar.gz" "https://github.com/openssl/openssl/releases/download/OpenSSL_1_0_1e/openssl-1.0.1e.tar.gz"
           tar zxf openssl-1.0.1e.tar.gz
           cd openssl-1.0.1e
-          ./config --prefix="$HOME/prebuilt" --openssldir="$HOME/prebuilt/openssl"
-          make && make install
-          git status
-
+          ./Configure mingw64 no-shared no-asm --prefix="$HOME/prebuilt" --openssldir="$HOME/prebuilt/openssl"
+          make -j$(nproc)
+          make install
 
       - name: Configure and Build
         run: |
           pwd
           ./autogen.sh
-          ./configure --disable-documentation CFLAGS="-g -O2 -Wno-error" --disable-ssp
+          ./configure --disable-documentation CFLAGS="-g -O2 -Wno-error" --disable-ssp --with-openssl="$HOME/prebuilt"
           make -j$(nproc)
 
       - name: Stage artifacts
